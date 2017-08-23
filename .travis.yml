@@ -11,11 +11,10 @@ python:
   - nightly # currently points to 3.7-dev
 
 install:
-  - pip install .
   - pip install -r requirements-nocuda.py
 
 script:
-  - coverage run --source=make_test test_setup.py test
+  - python evoltier/test_setup.py
 
 #after_success:
 #  - coveralls
