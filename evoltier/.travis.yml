@@ -1,0 +1,25 @@
+language: python
+
+python:
+  - 2.6
+  - 2.7
+  - 3.2
+  - 3.3
+  - 3.4
+  - 3.5
+  - 3.6
+  - nightly # currently points to 3.7-dev
+
+install:
+  - pip install .
+  - pip install -r requirements-nocuda.py
+
+script:
+  - coverage run --source=make_test test_setup.py test
+
+#after_success:
+#  - coveralls
+#
+#notifications:
+#  slack:
+#    secure: your_token_key

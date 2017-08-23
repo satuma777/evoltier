@@ -1,0 +1,6 @@
+from evoltier.test import test_probability_distribution
+from evoltier.test import test_multi_variable_gaussian
+
+TestProbabilityDistribution = test_probability_distribution.TestProbabilityDistribution
+TestMultiVariableGaussian = test_multi_variable_gaussian.TestMultiVariableGaussian
+
