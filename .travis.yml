@@ -13,8 +13,11 @@ python:
 install:
   - pip install -r requirements-nocuda.txt
 
+before_script:
+  - cd evoltier/test
+
 script:
-  - python evoltier/test_setup.py
+  - python make_test.py
 
 #after_success:
 #  - coveralls

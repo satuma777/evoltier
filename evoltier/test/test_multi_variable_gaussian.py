@@ -1,7 +1,5 @@
 import unittest
-import copy
 import numpy as np
-from scipy.stats import sem, chi2_contingency
 import itertools
 
 from evoltier.model import MultiVariableGaussian

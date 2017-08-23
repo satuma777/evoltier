@@ -1,4 +1,5 @@
 import unittest
+
 from evoltier.model import ProbabilityDistribution
 
 
