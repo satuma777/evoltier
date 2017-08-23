@@ -11,7 +11,7 @@ python:
   - nightly # currently points to 3.7-dev
 
 install:
-  - pip install -r requirements-nocuda.py
+  - pip install -r requirements-nocuda.txt
 
 script:
   - python evoltier/test_setup.py
