@@ -3,10 +3,13 @@ from six.moves import range
 import csv
 import os
 
+
 class Updater(object):
-    '''Abstraction of main loop'''
+    '''
+    Abstraction of main loop.
+    '''
     
-    def __init__(self, optimizer, obj_func, pop_size=1, threshold=None, max_iter=1e+3, out='result'):
+    def __init__(self, optimizer, obj_func, pop_size=1, threshold=None, max_iter=10000, out='result'):
         self.opt = optimizer
         self.obj_func = obj_func
         self.pop_size = pop_size
@@ -33,7 +36,7 @@ class Updater(object):
         success = False
         if self.min:
             best_eval = float('inf')
-            for i in range(int(self.max_iter)):
+            for i in range(self.max_iter):
                 sample = self.opt.target.sampling(pop_size=self.pop_size)
                 evals = self.obj_func(sample)
                 self.opt.update(evals=evals, sample=sample)
@@ -50,7 +53,7 @@ class Updater(object):
                     break
         else:
             best_eval = float('-inf')
-            for i in range(int(self.max_iter)):
+            for i in range(self.max_iter):
                 sample = self.opt.target.sampling(pop_size=self.pop_size)
                 evals = self.obj_func(sample)
                 self.opt.update(evals=evals, sample=sample)
