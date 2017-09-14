@@ -9,7 +9,7 @@ class Updater(object):
     Abstraction of main loop.
     '''
     
-    def __init__(self, optimizer, obj_func, pop_size=1, threshold=None, max_iter=10000, out='result'):
+    def __init__(self, optimizer, obj_func, pop_size=1, threshold=None, max_iter=10000, out='result', logging=False):
         self.opt = optimizer
         self.obj_func = obj_func
         self.pop_size = pop_size
@@ -17,14 +17,16 @@ class Updater(object):
         self.max_iter = max_iter
         self.min = optimizer.w_func.min
         self.out = out
+        self.logging = logging
 
-        if not os.path.isdir(out):
-            os.makedirs(out)
+        if self.logging:
+            if not os.path.isdir(out):
+                os.makedirs(out)
             
-        with open(out+'/log.csv', 'w') as log_file:
-            self.header = ['Generation', 'BestEval'] + self.opt.generate_header() + self.opt.target.generate_header()
-            csv_writer = csv.DictWriter(log_file, fieldnames=self.header)
-            csv_writer.writeheader()
+            with open(out+'/log.csv', 'w') as log_file:
+                self.header = ['Generation', 'BestEval'] + self.opt.generate_header() + self.opt.target.generate_header()
+                csv_writer = csv.DictWriter(log_file, fieldnames=self.header)
+                csv_writer.writeheader()
         
         if self.threshold is None and self.min:
             self.threshold = 1e-6
@@ -36,7 +38,7 @@ class Updater(object):
         success = False
         if self.min:
             best_eval = float('inf')
-            for i in range(self.max_iter):
+            for i in range(1, self.max_iter + 1):
                 sample = self.opt.target.sampling(pop_size=self.pop_size)
                 evals = self.obj_func(sample)
                 self.opt.update(evals=evals, sample=sample)
@@ -46,14 +48,16 @@ class Updater(object):
                     best_solution = sample[evals.argmin()]
                 
                 self.print_log(i, best_eval)
-                self.write_csv_log(i, best_eval)
+                
+                if self.logging:
+                    self.write_csv_log(i, best_eval)
                 
                 if best_eval < self.threshold:
                     success = True
                     break
         else:
             best_eval = float('-inf')
-            for i in range(self.max_iter):
+            for i in range(1, self.max_iter + 1):
                 sample = self.opt.target.sampling(pop_size=self.pop_size)
                 evals = self.obj_func(sample)
                 self.opt.update(evals=evals, sample=sample)
@@ -63,7 +67,9 @@ class Updater(object):
                     best_solution = sample[evals.argmax()]
 
                 self.print_log(i, best_eval)
-                self.write_csv_log(i, best_eval)
+                
+                if self.logging:
+                    self.write_csv_log(i, best_eval)
                 
                 if best_eval > self.threshold:
                     success = True
@@ -72,7 +78,7 @@ class Updater(object):
         return best_solution, best_eval, success
 
     def print_log(self, i, best_eval):
-        updater_info = 'Generation: {}\tBestEval: {}\t'.format(i, best_eval)
+        updater_info = 'Generation: {}\t BestEval: {}\t '.format(i, best_eval)
         distribution_info = self.opt.target.get_info()
         
         print(updater_info + distribution_info)

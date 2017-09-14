@@ -19,7 +19,6 @@ def negative_quad(x):
     #global mixima is zero.
     return - (x * x).sum(axis=1)
 
-
 def main():
     # set probability distribution
     gaussian = model.MultiVariableGaussian(dim=3)
@@ -34,7 +33,8 @@ def main():
     opt = GaussianNaturalGradientOptimizer(gaussian, w, lr)
     
     # set updater
-    upd = updater.Updater(optimizer=opt, obj_func=quad, pop_size=7, threshold=1e-100, out='result')
+    upd = updater.Updater(optimizer=opt, obj_func=quad, pop_size=100000, threshold=1e-30,
+                          out='result', max_iter=1000, logging=True)
     
     # run IGO and print result
     print(upd.run())

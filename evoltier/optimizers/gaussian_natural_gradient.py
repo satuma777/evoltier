@@ -37,7 +37,6 @@ class GaussianNaturalGradientOptimizer(Optimizer):
         elif self.target.model_class in 'Separable':
             grad_var = (w_der * derivation.T).sum(axis=1) - (weight.sum() * var)
         else:
-            #print(xp.dot(w_der, derivation), weight.sum())
             grad_var = xp.dot(w_der, derivation) - weight.sum() * var
         
         return grad_m, grad_var
