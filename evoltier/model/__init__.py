@@ -6,3 +6,6 @@ ProbabilityDistribution = probability_distribution.ProbabilityDistribution
 # HACK: The 'from' statement is not compliant to PEP8.
 from evoltier.model import multi_variable_gassian
 MultiVariableGaussian = multi_variable_gassian.MultiVariableGaussian
+
+from evoltier.model import bernoulli
+Bernoulli = bernoulli.Bernoulli

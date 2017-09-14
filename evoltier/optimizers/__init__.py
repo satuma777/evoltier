@@ -1,0 +1,2 @@
+from evoltier.optimizers import gaussian_natural_gradient
+GaussianNaturalGradientOptimizer = gaussian_natural_gradient.GaussianNaturalGradientOptimizer

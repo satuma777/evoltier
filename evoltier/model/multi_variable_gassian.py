@@ -1,5 +1,4 @@
 import numpy as np
-from math import log, pi
 from six.moves import range
 
 from evoltier.model import ProbabilityDistribution
@@ -15,45 +14,38 @@ class MultiVariableGaussian(ProbabilityDistribution):
         self.model_class = 'Gaussian'
         
         if self.mean is None:
-            self.mean = xp.zeros(dim)
+            self.mean = self.xp.zeros(self.dim)
+            
         if self.var is None:
-            self.var = xp.identity(dim)
+            self.var = self.xp.identity(self.dim)
+            
         if self.stepsize is None:
             self.stepsize = 1.
         
-        assert self.mean.size == dim and self.var.size == dim * dim, \
+        assert self.mean.size == self.dim and self.var.size == self.dim ** 2, \
             "Invalid value that dimensions DON'T match."
     
     def sampling(self, pop_size):
         xp = self.xp
         m = self.mean
         var = self.stepsize * self.var
-        sample = xp.random.multivariate_normal(m, var, pop_size)
+        sample = xp.random.multivariate_normal(mean=m, cov=var, size=pop_size, check_valid='raise')
         return sample
     
     def get_param(self):
         return self.mean, self.var, self.stepsize
     
     def set_param(self, mean=None, var=None, stepsize=None):
-        dim = self.dim
-        xp = self.xp
-        
-        if mean is None:
-            self.mean = xp.zeros(dim)
-        else:
+        if mean is not None:
             self.mean = mean
         
-        if var is None:
-            self.var = xp.identity(dim)
-        else:
+        if var is not None:
             self.var = var
         
-        if stepsize is None:
-            self.stepsize = 1.
-        else:
+        if stepsize is not None:
             self.stepsize = stepsize
 
-        assert self.mean.size == dim and self.var.size == dim ** 2, \
+        assert self.mean.size == self.dim and self.var.size == self.dim ** 2, \
             "Invalid value that dimensions DON'T match."
     
     def calculate_log_likelihood(self, sample):
