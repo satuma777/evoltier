@@ -168,3 +168,6 @@ ENV/
 [Ss]cripts
 pyvenv.cfg
 pip-selfcheck.json
+*.csv
+*.pyc
+*.pyx

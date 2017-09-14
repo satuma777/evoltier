@@ -29,7 +29,7 @@ class MultiVariableGaussian(ProbabilityDistribution):
         xp = self.xp
         m = self.mean
         var = self.stepsize * self.var
-        sample = xp.random.multivariate_normal(m, var, pop_size)
+        sample = xp.random.multivariate_normal(mean=m, cov=var, size=pop_size, check_valid='raise')
         return sample
     
     def get_param(self):
