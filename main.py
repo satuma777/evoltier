@@ -21,20 +21,20 @@ def negative_quad(x):
 
 def main():
     # set probability distribution
-    gaussian = model.MultiVariableGaussian(dim=3)
+    gaussian = model.MultiVariableGaussian(dim=100)
     
     # set utility function
     w = weight.QuantileBasedWeight(minimization=True)
     
     # set learning rate of distribution paramaters
-    lr = {'mean': 1., 'var': 1. / (3 ** 2)}
+    lr = {'mean': 1., 'cov': 1. / (3 ** 2)}
     
     # set optimizer
     opt = GaussianNaturalGradientOptimizer(gaussian, w, lr)
     
     # set updater
-    upd = updater.Updater(optimizer=opt, obj_func=quad, pop_size=100000, threshold=1e-30,
-                          out='result', max_iter=1000, logging=True)
+    upd = updater.Updater(optimizer=opt, obj_func=quad, pop_size=1000, threshold=1e-30,
+                          out='result', max_iter=10000, logging=True)
     
     # run IGO and print result
     print(upd.run())
