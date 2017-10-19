@@ -1,0 +1,9 @@
+[report]
+include =
+    evoltier/*.py
+omit =
+    evoltier/__init__.py
+    evoltier/model/__init__.py
+    evoltier/optimizers/__init__.py
+    evoltier/test/__init__.py
+
