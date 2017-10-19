@@ -1,12 +1,8 @@
-### Django ###
 *.log
 *.pot
 *.pyc
 __pycache__/
-local_settings.py
-db.sqlite3
 media
-staticfiles/
 
 ### OSX ###
 *.DS_Store
@@ -171,8 +167,4 @@ pip-selfcheck.json
 *.csv
 *.pyc
 *.pyx
-evoltier/__pycache__/__init__.cpython-36.pyc
-evoltier/model/__pycache__/__init__.cpython-36.pyc
-evoltier/model/__pycache__/multi_variable_gassian.cpython-36.pyc
-evoltier/model/__pycache__/probability_distribution.cpython-36.pyc
 *.lprof
