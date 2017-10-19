@@ -8,8 +8,8 @@ class Updater(object):
     '''
     Abstraction of main loop.
     '''
-    
-    def __init__(self, optimizer, obj_func, pop_size=1, threshold=None, max_iter=10000, out='result', logging=False):
+    def __init__(self, optimizer, obj_func, pop_size=1, threshold=None, max_iter=10000, out='result',
+                 logging=False):
         self.opt = optimizer
         self.obj_func = obj_func
         self.pop_size = pop_size

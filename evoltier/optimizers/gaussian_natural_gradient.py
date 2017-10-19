@@ -7,8 +7,8 @@ class GaussianNaturalGradientOptimizer(Optimizer):
     def __init__(self, distribution, weight_function, lr):
         super(GaussianNaturalGradientOptimizer, self).__init__(distribution, weight_function, lr)
         
-        if 'mean' not in lr or 'var' not in lr:
-            print('lr does not have attribute "mean" or "var". ')
+        if 'mean' not in lr or 'cov' not in lr:
+            print('lr does not have attribute "mean" or "cov". ')
             exit(1)
     
     def update(self, evals, sample):
@@ -17,15 +17,15 @@ class GaussianNaturalGradientOptimizer(Optimizer):
         self.t += 1
         weight = self.w_func(evals)
 
-        mean, var, stepsize = self.target.get_param()
-        grad_m, grad_var = self.compute_natural_grad(weight, sample, mean, var)
+        mean, cov, sigma = self.target.get_param()
+        grad_m, grad_cov = self.compute_natural_grad(weight, sample, mean, cov)
 
         new_mean = mean + self.lr['mean'] * grad_m
-        new_var = var + self.lr['var'] * grad_var
+        new_cov = cov + self.lr['cov'] * grad_cov
 
-        self.target.set_param(mean=new_mean, var=new_var)
+        self.target.set_param(mean=new_mean, cov=new_cov)
     
-    def compute_natural_grad(self, weight, sample, mean, var):
+    def compute_natural_grad(self, weight, sample, mean, cov):
         xp = self.target.xp
         derivation = sample - mean
         w_der = weight * derivation.T
@@ -33,18 +33,18 @@ class GaussianNaturalGradientOptimizer(Optimizer):
         
         if self.target.model_class in 'Isotropic':
             norm_w_der = xp.diag(xp.dot(w_der, w_der.T))
-            grad_var = (xp.sum(weight * norm_w_der) / self.target.dim) - (xp.sum(weight) * var)
+            grad_cov = (xp.sum(weight * norm_w_der) / self.target.dim) - (xp.sum(weight) * cov)
         elif self.target.model_class in 'Separable':
-            grad_var = (w_der * derivation.T).sum(axis=1) - (weight.sum() * var)
+            grad_cov = (w_der * derivation.T).sum(axis=1) - (weight.sum() * cov)
         else:
-            grad_var = xp.dot(w_der, derivation) - weight.sum() * var
+            grad_cov = xp.dot(w_der, derivation) - weight.sum() * cov
         
-        return grad_m, grad_var
+        return grad_m, grad_cov
     
     def generate_header(self):
-        header = ['LearningRateMean', 'LearningRateVar']
+        header = ['LearningRateMean', 'LearningRateCov']
         return header
     
     def get_info_dict(self):
-        info = {'LearningRateMean': self.lr['mean'], 'LearningRateVar': self.lr['var']}
+        info = {'LearningRateMean': self.lr['mean'], 'LearningRateCov': self.lr['cov']}
         return info

@@ -21,7 +21,7 @@ class QuantileBasedWeight(object):
         self.min = minimization
         self.non_inc_func = non_increasing_function
         self.xp = xp
-
+    
     def __call__(self, evaluation, likelihood_ratio=None):
         pop_size = evaluation.shape[0]
         if likelihood_ratio is None:
@@ -40,7 +40,9 @@ class QuantileBasedWeight(object):
         
         xp = self.xp
         flatten_array = xp.ravel(np.asarray(evaluation))
-        sorter = np.argsort(flatten_array)
+        sorter = xp.argsort(flatten_array)
+        if not self.min:
+            sorter = sorter[::-1]
     
         # set label sequentially that minimum eval =  0 , ... , maximum eval = pop_size - 1
         # --- Example ---
@@ -52,17 +54,16 @@ class QuantileBasedWeight(object):
         arr = evaluation[sorter]
         obs = xp.r_[True, arr[1:] != arr[:-1]]
         dense = obs.cumsum()[inv]
-        if not self.min:
-            dence = - (dense - pop_size) + 1
     
         # cumulative counts of likelihood ratio
         count = xp.r_[False, likelihood_ratio[sorter].cumsum()]
     
         if type == 'upper':
-            quantile = count[dense]
+            cum_llr = count[dense]
         elif type == 'lower':
-            quantile = (count[dense] - 1)
-            
-        return quantile / pop_size
+            cum_llr = count[dense - 1]
+        
+        quantile = cum_llr / pop_size
+        return quantile
 
 #TODO: LebesgueMeasureBasedWeight [Akimoto2012(GECCO2012)]

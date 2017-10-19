@@ -20,17 +20,17 @@ class TestMultiVariableGaussian(unittest.TestCase):
         self.assertTrue(sample.shape, (pop_size, self.dim))
 
     def test_get_param(self):
-        mean, var, stepsize = self.gaussian.get_param()
+        mean, cov, sigma = self.gaussian.get_param()
         self.assertTrue(np.array_equal(mean, np.zeros(self.dim)))
-        self.assertTrue(np.array_equal(var, np.eye(self.dim)))
-        self.assertEqual(stepsize, 1.)
+        self.assertTrue(np.array_equal(cov, np.eye(self.dim)))
+        self.assertEqual(sigma, 1.)
 
     def test_set_param(self):
         mean = [2 * np.zeros(self.dim), None]
-        var = [2 * np.eye(self.dim), None]
-        stepsize = [2, None]
+        cov = [2 * np.eye(self.dim), None]
+        sigma = [2, None]
         
-        for m, v, s in itertools.product(mean, var, stepsize):
+        for m, v, s in itertools.product(mean, cov, sigma):
             set_gaussian = MultiVariableGaussian(self.dim)
             set_gaussian.set_param(m, v, s)
             if m is not None:
@@ -39,18 +39,18 @@ class TestMultiVariableGaussian(unittest.TestCase):
                 self.assertTrue(np.array_equal(set_gaussian.mean, self.gaussian.mean))
             
             if v is not None:
-                self.assertTrue(np.array_equal(set_gaussian.var, v))
+                self.assertTrue(np.array_equal(set_gaussian.cov, v))
             else:
-                self.assertTrue(np.array_equal(set_gaussian.var, self.gaussian.var))
+                self.assertTrue(np.array_equal(set_gaussian.cov, self.gaussian.cov))
             
             if s is not None:
-                self.assertEqual(set_gaussian.stepsize, s)
+                self.assertEqual(set_gaussian.sigma, s)
             else:
-                self.assertEqual(set_gaussian.stepsize, self.gaussian.stepsize)
+                self.assertEqual(set_gaussian.sigma, self.gaussian.sigma)
             
     def test_calculate_log_likelihood(self):
         means = np.array([self.gaussian.mean])
-        log_Cdet = np.log(np.linalg.det(self.gaussian.var))
+        log_Cdet = np.log(np.linalg.det(self.gaussian.cov))
         min_lll = np.array([-0.5 * (self.dim * np.log(2 * np.pi) + log_Cdet)])
         self.assertTrue(np.array_equal(self.gaussian.calculate_log_likelihood(means), min_lll))
 
