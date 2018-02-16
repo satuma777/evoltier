@@ -1,2 +1,4 @@
 from evoltier.optimizers import gaussian_natural_gradient
+#from evoltier.optimizers import cma_es
 GaussianNaturalGradientOptimizer = gaussian_natural_gradient.GaussianNaturalGradientOptimizer
+#CMAES = cma_es.CMAES

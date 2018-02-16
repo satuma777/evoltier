@@ -12,7 +12,7 @@ class Optimizer(object):
         if not callable(self.w_func):
             raise TypeError('weight function is NOT callable.')
     
-    def update(self):
+    def update(self, evals, sample):
         raise NotImplementedError()
     
     def get_info_dict(self):
