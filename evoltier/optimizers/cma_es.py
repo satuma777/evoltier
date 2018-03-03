@@ -1,61 +1,73 @@
 from __future__ import print_function, division
-from math import sqrt
 
-from evoltier.optimizers import GaussianNaturalGradientOptimizer
+from evoltier.optimizers.gaussian_natural_gradient import GaussianNaturalGradientOptimizer
+from evoltier.utils import CMAESParameters
 
 
 class CMAES(GaussianNaturalGradientOptimizer):
     def __init__(self, distribution, weight_function, lr):
         super(CMAES, self).__init__(distribution, weight_function, lr)
 
-        if ('c_1' not in lr) or ('c_sigma' not in lr)
-        or ('d_sigma' not in lr) or ('c_C' not in lr) or :
-            print('lr does not have attribute "c_1", "c_sigma", "d_sigma" or "c_C".')
-            exit(1)
-
         xp = self.target.xp
         dim = self.target.dim
         self.p_c = xp.zeros(dim)
         self.p_sigma = xp.zeros(dim)
-        self.ex_norm = sqrt(dim) * (1. - 1. / (4. * dim) + 1. / (21. * dim ** 2))
+        self.ex_norm = xp.sqrt(dim) * (1. - 1. / (4. * dim) + 1. / (21. * (dim ** 2)))
+        self.__cache_hyperparams = False
 
     def update(self, evals, sample):
+        xp = self.target.xp
         self.t += 1
-        weight = self.w_func(evals)
+        weight = self.w_func(evals, xp=xp)
 
-        mean, cov, sigma = self.target.get_param()
+        mean, cov, sigma = self.target.mean, self.target.cov, self.target.sigma
+
+        mu_eff = CMAESParameters.mu_eff(weight, xp=xp)
+        c_C, c_1, c_mu, c_sigma, d_sigma, c_m = self.get_hyperparams(self.lr, mu_eff)
         grad_m, grad_cov = self.compute_natural_grad(weight, sample, mean, cov, sigma)
-        self.p_c, self.p_sigma, h_sigma = self.compute_evolutionary_path(weight, grad_m)
-        rank_one_cov = self.lr['c_1'] * self.p_c * self.target.xp.outer(self.p_c, self.p_c)
-        delta = (1. - h_sigma) * self.lr['c_C'] * (2. - self.lr['c_C'])
-        cov_factor = (1 + self.lr['c_1'] * (delta - 1.) - self.lr['cov'])
 
-        new_mean = mean + self.lr['mean'] * grad_m
-        new_cov = cov_factor * cov + self.lr['cov'] * grad_cov + rank_one_cov
-        new_sigma = sigma * self.compute_step_size(self.p_sigma)
+        h_sigma = self.update_evo_path(mu_eff, grad_m / sigma, c_sigma, c_C)
+        delta = (1. - h_sigma) * c_C * (2. - c_C)
 
-        self.target.set_param(mean=new_mean, cov=new_cov, sigma=new_sigma)
+        self.target.mean += c_m * grad_m
+        self.target.cov += c_1 * (cov * (delta - 1) + xp.outer(self.p_c, self.p_c)) \
+                           + c_mu * (grad_cov - xp.sum(weight) * cov)
+        self.target.sigma *= self.compute_step_size(c_sigma, d_sigma)
 
-    def compute_evolutionary_path(self, weight, grad_m):
+    def update_evo_path(self, mu_eff, y_w, c_sigma, c_C):
         xp = self.target.xp
-        p_sigma_norm_scaled = xp.linalg.norm(self.p_sigma) /
-            sqrt(1. - (1. - self.lr['c_sigma']) ** (2 * (self.t + 1)))
-        h_sigma = self._heaviside(self.ex_norm, p_sigma_norm_scaled)
-        mu_eff = 1. / xp.dot(weight, weight)
-        p_c = (1. - self.lr['c_C']) * self.p_c +
-            h_sigma * sqrt(self.lr['c_C'] * (2. - self.lr['c_C']) * mu_eff) * grad_m
-        inv_sqrtC = xp.linalg.inv(xp.linalg.cholesky(self.target.cov))
-        p_sigma = (1. - self.lr['c_sigma']) * self.p_sigma +
-            h_sigma * sqrt(self.lr['c_sigma'] * (2. - self.lr['c_sigma']) * mu_eff) *
-            inv_sqrtC * grad_m
-        return p_c, p_sigma, h_sigma
+        
+        # compute new p_sigma
+        D_inv = xp.reciprocal(xp.sqrt(self.target.eigan_vals))[:, None]
+        inv_sqrtC = xp.dot(self.target.B * D_inv, self.target.B.T)
+        self.p_sigma += xp.sqrt(c_sigma * (2. - c_sigma) * mu_eff) * xp.dot(y_w, inv_sqrtC) - c_sigma * self.p_sigma
 
-    def compute_step_size(self, p_sigma):
+        # compute new p_c
+        p_sigma_norm_scaled = xp.linalg.norm(self.p_sigma) / xp.sqrt(1. - ((1. - c_sigma) ** (2 * (self.t + 1))))
+        h_sigma = (1.4 + 2. / (self.target.dim + 1)) * self.ex_norm < p_sigma_norm_scaled
+        self.p_c += h_sigma * xp.sqrt(c_C * (2. - c_C) * mu_eff) * y_w - c_C * self.p_c
+        return h_sigma
+
+    def compute_step_size(self, c_sigma, d_sigma):
         xp = self.target.xp
-        control_factor = xp.exp(self.lr['c_sigma'] / self.lr['d_sigma']
-                            * (-1. + xp.linalg.norm(self.p_sigma) / self.ex_norm))
+        control_factor = xp.exp((c_sigma / d_sigma) * (-1. + xp.linalg.norm(self.p_sigma) / self.ex_norm))
         return control_factor
+    
+    def get_hyperparams(self, lr, *args):
+        if isinstance(lr, CMAESParameters):
+            return lr.get_parameters(None, mu_eff=args[0], xp=self.target.xp)
+        else:
+            c_m = self.lr['mean']
+            c_mu = self.lr['cov']
+            c_1 = self.lr['c_1']
+            c_C = self.lr['c_C']
+            c_sigma = self.lr['c_sigma']
+            d_sigma = self.lr['d_sigma']
+        return c_C, c_1, c_mu, c_sigma, d_sigma, c_m
 
+    @staticmethod
     def _heaviside(x, y):
-        if x < y : return 0.
-        else: return 1.
+        if x < y:
+            return 0.
+        else:
+            return 1.

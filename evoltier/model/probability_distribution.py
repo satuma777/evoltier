@@ -5,7 +5,7 @@ class ProbabilityDistribution(object):
     def __init__(self, xp=np):
         self.xp = xp
     
-    def sampling(self):
+    def sampling(self, pop_size):
         raise NotImplementedError()
     
     def get_param(self):
@@ -14,7 +14,7 @@ class ProbabilityDistribution(object):
     def set_param(self):
         raise NotImplementedError()
 
-    def calculate_log_likelihood(self):
+    def calculate_log_likelihood(self, sample):
         raise NotImplementedError()
     
     def get_info(self):

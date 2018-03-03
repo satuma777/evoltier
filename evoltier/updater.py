@@ -32,7 +32,7 @@ class Updater(object):
             self.threshold = 1e-6
         elif self.threshold is None:
             self.threshold = 1e+6
-    
+
     def run(self):
         best_solution = None
         success = False
