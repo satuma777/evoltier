@@ -16,6 +16,14 @@ def cma_like_weight(q_plus, xp):
     return weight_plus
 
 
+def pbil_weight(q_plus, xp):
+    weight_plus = xp.zeros_like(q_plus)
+    weight_plus[q_plus >= 0.25] = -1
+    weight_plus[q_plus <= 0.25] = 1
+
+    return weight_plus
+
+
 class QuantileBasedWeight(object):
     def __init__(self, minimization=True, non_increasing_function=cma_like_weight, normalize=False):
         self.min = minimization

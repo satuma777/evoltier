@@ -34,7 +34,8 @@ def main(gpuID=-1):
         gaussian.use_gpu()
 
     # set utility function
-    w = weight.QuantileBasedWeight(minimization=False, normalize=True)
+    w = weight.QuantileBasedWeight(minimization=False, normalize=True,
+                                   non_increasing_function=weight.pbil_weight)
 
     # set learning rate of distribution parameters
     #lr = CMAESParameters(dim=dim)
