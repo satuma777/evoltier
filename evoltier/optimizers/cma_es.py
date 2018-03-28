@@ -30,8 +30,7 @@ class CMAES(GaussianNaturalGradientOptimizer):
         delta = (1. - h_sigma) * c_C * (2. - c_C)
 
         self.target.mean += c_m * grad_m
-        self.target.cov += c_1 * (cov * (delta - 1) + xp.outer(self.p_c, self.p_c)) \
-                           + c_mu * (grad_cov - xp.sum(weight) * cov)
+        self.target.cov += c_1 * (cov * (delta - 1) + xp.outer(self.p_c, self.p_c)) + c_mu * (grad_cov - xp.sum(weight) * cov)
         self.target.sigma *= self.compute_step_size(c_sigma, d_sigma)
 
     def update_evo_path(self, mu_eff, y_w, c_sigma, c_C):
@@ -65,9 +64,3 @@ class CMAES(GaussianNaturalGradientOptimizer):
             d_sigma = self.lr['d_sigma']
         return c_C, c_1, c_mu, c_sigma, d_sigma, c_m
 
-    @staticmethod
-    def _heaviside(x, y):
-        if x < y:
-            return 0.
-        else:
-            return 1.

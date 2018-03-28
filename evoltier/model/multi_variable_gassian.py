@@ -33,7 +33,6 @@ class MultiVariableGaussian(ProbabilityDistribution):
             self.sigma = sigma
 
     def calculate_log_likelihood(self, sample):
-        # TODO: Refactor
         xp = self.xp
         pop_size = len(sample)
         deviation = sample - self.mean

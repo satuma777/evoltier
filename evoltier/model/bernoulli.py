@@ -11,7 +11,7 @@ class Bernoulli(ProbabilityDistribution):
         self.model_class = 'Bernoulli'
     
         if self.theta is None:
-            self.theta = self.xp.ones(self.dim)
+            self.theta = 0.5 * self.xp.ones(self.dim)
             
         assert self.theta.size == self.dim, \
             "Invalid value that dimensions DON'T match."

@@ -59,5 +59,3 @@ class QuantileBasedWeight(object):
 
         quantile = cum_llr / pop_size
         return quantile
-
-#TODO: LebesgueMeasureBasedWeight [Akimoto2012(GECCO2012)]
