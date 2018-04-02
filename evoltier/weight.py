@@ -18,9 +18,8 @@ def cma_like_weight(q_plus, xp):
 
 def pbil_weight(q_plus, xp):
     weight_plus = xp.zeros_like(q_plus)
-    weight_plus[q_plus >= 0.25] = -1
+    weight_plus[q_plus >= 0.75] = -1
     weight_plus[q_plus <= 0.25] = 1
-
     return weight_plus
 
 
@@ -37,13 +36,17 @@ class QuantileBasedWeight(object):
         q_plus = self.compute_quantile(evaluation, likelihood_ratio, pop_size, xp=xp)
         weight = self.non_inc_func(q_plus, xp) / pop_size
         if self.normalize:
-            return weight / xp.linalg.norm(weight, ord=1)
+            normalized_term = xp.linalg.norm(weight, ord=1)
+            if normalized_term != 0.:
+                return weight / normalized_term
+            else:
+                return weight
         else:
             return weight
 
     def compute_quantile(self, evaluation, likelihood_ratio, pop_size, xp=np, rank_rule='upper'):
         sorter = xp.argsort(evaluation)
-        if not self.min:
+        if self.min is False:
             sorter = sorter[::-1]
 
         # set label sequentially that minimum eval =  0 , ... , maximum eval = pop_size - 1

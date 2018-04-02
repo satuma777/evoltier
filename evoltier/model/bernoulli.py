@@ -60,4 +60,4 @@ class Bernoulli(ProbabilityDistribution):
     def theta(self, new_theta):
         xp = self.xp
         self. __theta = xp.minimum(xp.maximum(new_theta, self.lower), self.upper)
-        print(self.__theta)
+

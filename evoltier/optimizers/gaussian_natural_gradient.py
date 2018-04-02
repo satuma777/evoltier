@@ -40,8 +40,8 @@ class GaussianNaturalGradientOptimizer(Optimizer):
         return header
 
     def get_info_dict(self):
-        info = {'LearningRateMean': self.lr['mean'],
-                'LearningRateCov': self.lr['cov']}
+        info = {'LearningRateMean': self.lr.mean,
+                'LearningRateCov': self.lr.cov}
         return info
 
     def get_hyperparams(self, lr, weights):

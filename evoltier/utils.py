@@ -2,8 +2,16 @@ from math import sqrt, floor, log
 import numpy as np
 
 
+class HyperParameters(object):
+    def __init__(self, dict_params):
+        self.dict_params = dict_params
+
+    def get_all_params(self, *args, **kargs):
+        return list(self.dict_params.values())
+
+
 class CMAESParameters(object):
-    def __init__(self, dim, alpha_cov=2.):
+    def __init__(self, dim, weight_func, alpha_cov=2.):
         self.dim = dim
         self.alpha_cov = alpha_cov
     

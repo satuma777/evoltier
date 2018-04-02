@@ -29,24 +29,24 @@ def leading_ones(x):
 def main(gpuID=-1):
     dim = 100
     # set probability distribution
-    gaussian = model.Bernoulli(dim=dim)
+    gaussian = model.MultiVariableGaussian(dim=dim)
     if gpuID >= 0:
         gaussian.use_gpu()
 
     # set utility function
     w = weight.QuantileBasedWeight(minimization=False, normalize=True,
-                                   non_increasing_function=weight.pbil_weight)
+                                   non_increasing_function=weight.cma_like_weight)
 
     # set learning rate of distribution parameters
-    #lr = CMAESParameters(dim=dim)
-    lr = {'theta': 1 / dim}
+    lr = CMAESParameters(dim=dim)
+    #lr = {'theta': 1 / dim}
 
     # set optimizer
-    opt = BernoulliNaturalGradientOptimizer(gaussian, w, lr)
+    opt = GaussianNaturalGradientOptimizer(gaussian, w, lr)
 
     # set updater
-    upd = updater.Updater(optimizer=opt, obj_func=leading_ones, pop_size=40, threshold=10000,
-                          out='result', max_iter=10000, logging=True)
+    upd = updater.Updater(optimizer=opt, obj_func=leading_ones, pop_size=100, threshold=float('inf'),
+                          out='result', max_iter=1000000, logging=True)
 
     # run IGO and print result
     print(upd.run())
