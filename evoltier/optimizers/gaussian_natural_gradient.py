@@ -1,7 +1,6 @@
 from __future__ import print_function, division
 
 from evoltier.optimizer import Optimizer
-from evoltier.utils import CMAESParameters
 
 
 class GaussianNaturalGradientOptimizer(Optimizer):
@@ -10,14 +9,15 @@ class GaussianNaturalGradientOptimizer(Optimizer):
 
     def update(self, evals, sample):
         self.t += 1
-        weights = self.w_func(evals, xp=self.target.xp)
+        xp = self.target.xp
+        weights = self.w_func(evals, xp=xp)
+        self.lr.set_parameters(weights, xp=xp)
 
         mean, cov, sigma = self.target.mean, self.target.cov, self.target.sigma
-        lr_m, lr_cov = self.get_hyperparams(self.lr, weights)
         grad_m, grad_cov = self.compute_natural_grad(weights, sample, mean, cov, sigma)
 
-        self.target.mean += lr_m * grad_m
-        self.target.cov += lr_cov * grad_cov
+        self.target.mean += self.lr.c_m * grad_m
+        self.target.cov += self.lr.c_C * grad_cov
 
     def compute_natural_grad(self, weight, sample, mean, cov, sigma):
         xp = self.target.xp
@@ -40,13 +40,6 @@ class GaussianNaturalGradientOptimizer(Optimizer):
         return header
 
     def get_info_dict(self):
-        info = {'LearningRateMean': self.lr.mean,
-                'LearningRateCov': self.lr.cov}
+        info = {'LearningRateMean': self.lr.c_m,
+                'LearningRateCov': self.lr.c_C}
         return info
-
-    def get_hyperparams(self, lr, weights):
-        if isinstance(lr, CMAESParameters):
-            mu_eff = lr.mu_eff(weights, xp=self.target.xp)
-            return lr.c_m(), lr.c_mu(mu_eff, self.target.dim, 0)
-        else:
-            return self.lr['mean'], self.lr['cov']

@@ -10,10 +10,10 @@ class BernoulliNaturalGradientOptimizer(Optimizer):
     def update(self, evals, sample):
         self.t += 1
         weights = self.w_func(evals, xp=self.target.xp)
+        self.lr.set_parameters(weights, xp=self.target.xp)
 
         grad_theta = self.compute_natural_grad(weights, sample, self.target.theta)
-
-        self.target.theta += self.lr['theta'] * grad_theta
+        self.target.theta += self.lr.eta * grad_theta
 
     def compute_natural_grad(self, weights, sample, theta):
         xp = self.target.xp
@@ -21,7 +21,7 @@ class BernoulliNaturalGradientOptimizer(Optimizer):
         return grad_theta
 
     def get_info_dict(self):
-        info = {'LearningRate': self.lr['theta']}
+        info = {'LearningRate': self.lr.eta}
         return info
 
     def generate_header(self):
