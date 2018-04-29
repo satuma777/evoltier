@@ -19,12 +19,15 @@ def negative_quad(x):
     # global mixima is zero.
     return - (x * x).sum(axis=1)
 
+
 def onemax(x):
     return x.sum(axis=1)
+
 
 def leading_ones(x):
     import numpy as np
     return np.sum(np.dot(x, np.tri(x.shape[1])), axis=1)
+
 
 def main(gpuID=-1):
     dim = 100
@@ -43,7 +46,7 @@ def main(gpuID=-1):
     #lr = HyperParameters({'eta': 1 / dim})
 
     # set optimizer
-    opt = GaussianNaturalGradientOptimizer(gaussian, w, lr)
+    opt = CMAES(gaussian, w, lr)
     #opt = BernoulliNaturalGradientOptimizer(gaussian, w, lr)
 
     # set updater
