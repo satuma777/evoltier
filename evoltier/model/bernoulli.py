@@ -4,21 +4,17 @@ from evoltier.model import ProbabilityDistribution
 
 
 class Bernoulli(ProbabilityDistribution):
-    def __init__(self, dim, theta=None, xp=np):
+    def __init__(self, dim, theta=None, upper=None, lower=None, xp=np):
         self.dim = dim
-        self.theta = theta
         self.xp = xp
+        self.upper = upper if upper is not None else 1. - 1. / self.dim
+        self.lower = lower if lower is not None else 1. / self.dim
+        self.theta = theta if theta is not None else 0.5 * self.xp.ones(self.dim)
         self.model_class = 'Bernoulli'
-    
-        if self.theta is None:
-            self.theta = self.xp.ones(self.dim)
-            
-        assert self.theta.size == self.dim, \
-            "Invalid value that dimensions DON'T match."
     
     def sampling(self, pop_size):
         xp = self.xp
-        size = (pop_size,) + self.theta.shape
+        size = (pop_size, self.dim)
         samples = xp.random.binomial(n=1, p=self.theta, size=size)
         return samples
         
@@ -28,13 +24,10 @@ class Bernoulli(ProbabilityDistribution):
     def set_param(self, theta=None):
         if theta is not None:
             self.theta = theta
-        
-        assert self.theta.size == self.dim, \
-            "Invalid value that dimensions DON'T match."
     
     def calculate_log_likelihood(self, sample):
         xp = self.xp
-        lll = xp.sum(xp.log(sample * self.theta + (1. - sample) * (1. - self.sample)))
+        lll = xp.sum(xp.log(sample * self.theta + (1. - sample) * (1. - self.theta)))
         return lll
     
     def get_info(self):
@@ -58,3 +51,13 @@ class Bernoulli(ProbabilityDistribution):
         mini = xp.min(self.theta)
         maxi = xp.max(self.theta)
         return mean, var, median, mini, maxi
+
+    @property
+    def theta(self):
+        return self.__theta
+
+    @theta.setter
+    def theta(self, new_theta):
+        xp = self.xp
+        self. __theta = xp.minimum(xp.maximum(new_theta, self.lower), self.upper)
+
