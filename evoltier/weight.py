@@ -52,12 +52,12 @@ class RankingBasedSelection(QuantileBasedSelection):
     def __init__(self, is_minimize=True, is_normalize=False):
         super(RankingBasedSelection, self).__init__(is_minimize, is_normalize)
 
-    def __call__(self, evals, xp=np):
-        ranking = self.compute_ranking(evals, xp=xp)
+    def __call__(self, evals, coefficient=None, xp=np,):
+        ranking = self.compute_ranking(evals, coefficient=coefficient, xp=xp)
         weight = self.transform(ranking, xp=xp)
         if self.is_minimize:
             weight /= xp.linalg.norm(weight, ord=1)
         return weight
 
-    def compute_ranking(self, evals, xp=np):
-        return self.compute_quantiles(evals, xp=xp) * len(evals)
+    def compute_ranking(self, evals, coefficient=None, xp=np):
+        return self.compute_quantiles(evals, coefficient=coefficient, xp=xp) * len(evals)
