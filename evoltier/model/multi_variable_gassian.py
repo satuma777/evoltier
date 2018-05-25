@@ -19,47 +19,32 @@ class MultiVariableGaussian(ProbabilityDistribution):
         samples = self.mean + self.sigma * xp.dot(xp.random.randn(pop_size, self.dim), sqrtC)
         return samples
 
-    def get_param(self):
-        return self.mean, self.cov, self.sigma
-    
-    def set_param(self, mean=None, cov=None, sigma=None):
-        if mean is not None:
-            self.mean = mean
-        
-        if cov is not None:
-            self.cov = cov
-        
-        if sigma is not None:
-            self.sigma = sigma
-
-    def calculate_log_likelihood(self, sample):
-        xp = self.xp
-        pop_size = len(sample)
-        deviation = sample - self.mean
-        comats = xp.array([self.sigma * self.cov for _ in range(pop_size)])
-        Cinv_der = xp.linalg.solve(comats, deviation)
-        log_Cdet = xp.log(xp.linalg.det(self.cov))
-        loglikelihood = -0.5 * (self.dim * xp.log(2 * xp.pi) + log_Cdet + xp.diag(xp.dot(Cinv_der, deviation.T)))
-        return loglikelihood
-
     def get_info(self):
-        return 'MaxEigenValue: {}, MinEigenValue: {},'.format(self.var_max, self.var_min)
+        return 'MaxEigenValue: {:.2e}, MinEigenValue: {:.2e},'.format(self.var_max, self.var_min)
 
     def get_info_dict(self):
         return {'MaxEigenValue': self.var_max, 'MinEigenValue': self.var_min}
 
     def generate_header(self):
         return ['MaxEigenValue', 'MinEigenValue']
-    
+
     def eigan_decomp_cov(self, cov):
         xp = self.xp
         if xp == np:
             from numpy.dual import eigh
-            self.eigan_vals, self.B = eigh(cov)
+            eigan_vals, B = eigh(cov)
         else:
-            self.eigan_vals, self.B = xp.linalg.eigh(cov)
-        self.var_min = self.sigma * self.sigma * self.eigan_vals.min()
-        self.var_max = self.sigma * self.sigma * self.eigan_vals.max()
+            eigan_vals, B = xp.linalg.eigh(cov)
+
+        if eigan_vals.min() < 0:
+            print('Wanning: Minimum eigan value is negative.')
+            return False
+
+        self.eigan_vals = eigan_vals
+        self.B = B
+        self.var_max = (self.sigma ** 2) * eigan_vals.max()
+        self.var_min = (self.sigma ** 2) * eigan_vals.min()
+        return True
 
     def use_gpu(self):
         super(MultiVariableGaussian, self).use_gpu()
@@ -69,9 +54,8 @@ class MultiVariableGaussian(ProbabilityDistribution):
     @property
     def cov(self):
         return self.__cov
-    
+
     @cov.setter
     def cov(self, new_cov):
-        self.eigan_decomp_cov(new_cov)
-        self.__cov = new_cov
-
+        if self.eigan_decomp_cov(new_cov):
+            self.__cov = new_cov

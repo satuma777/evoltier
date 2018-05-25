@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
 from __future__ import print_function
 
 from evoltier.optimizers import CMAES, GaussianNaturalGradientOptimizer, BernoulliNaturalGradientOptimizer
 from evoltier import updater
 from evoltier import weight
 from evoltier import model
+from evoltier.selection import PBILSelection, CMALargePopSizeSelection, CMASelection, NESSelection
 from evoltier.utils import CMAESParameters, HyperParameters
 
 
@@ -38,16 +38,16 @@ def main(gpuID=-1):
         gaussian.use_gpu()
 
     # set utility function
-    w = weight.QuantileBasedWeight(minimization=True, normalize=True,
-                                   non_increasing_function=weight.cma_like_weight)
+    w = NESSelection(is_minimize=True)
+    #w = PBILSelection(is_minimize=True, selection_rate=0.5)
 
     # set learning rate of distribution parameters
     lr = CMAESParameters(dim=dim)
     #lr = HyperParameters({'eta': 1 / dim})
 
     # set optimizer
-    opt = CMAES(gaussian, w, lr)
-    #opt = BernoulliNaturalGradientOptimizer(gaussian, w, lr)
+    opt = CMAES(w, lr, dim=dim)
+    #opt = BernoulliNaturalGradientOptimizer(w, lr, dim=dim)
 
     # set updater
     upd = updater.Updater(optimizer=opt, obj_func=quad, pop_size=100, threshold=float('-inf'),

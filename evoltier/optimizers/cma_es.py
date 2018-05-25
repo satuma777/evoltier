@@ -4,8 +4,8 @@ from evoltier.optimizers.gaussian_natural_gradient import GaussianNaturalGradien
 
 
 class CMAES(GaussianNaturalGradientOptimizer):
-    def __init__(self, distribution, weight_function, lr):
-        super(CMAES, self).__init__(distribution, weight_function, lr)
+    def __init__(self, weight_function, lr, distribution=None, dim=None):
+        super(CMAES, self).__init__(weight_function, lr, distribution, dim)
 
         xp = self.target.xp
         dim = self.target.dim
@@ -27,16 +27,16 @@ class CMAES(GaussianNaturalGradientOptimizer):
 
         grad_m, grad_cov = self.compute_natural_grad(weights, sample, mean, cov, sigma)
 
-        h_sigma = self.update_evo_path(mu_eff, grad_m / sigma, c_sigma, c_C)
+        h_sigma = self.update_evolution_path(mu_eff, grad_m / sigma, c_sigma, c_C)
         delta = (1. - h_sigma) * c_C * (2. - c_C)
 
         self.target.mean += c_m * grad_m
         self.target.cov += c_1 * (cov * (delta - 1) + xp.outer(self.p_c, self.p_c)) + c_mu * (grad_cov - xp.sum(weights) * cov)
         self.target.sigma *= self.compute_step_size(c_sigma, d_sigma)
 
-    def update_evo_path(self, mu_eff, y_w, c_sigma, c_C):
+    def update_evolution_path(self, mu_eff, y_w, c_sigma, c_C):
         xp = self.target.xp
-        
+
         # compute new p_sigma
         D_inv = xp.reciprocal(xp.sqrt(self.target.eigan_vals))[:, None]
         inv_sqrtC = xp.dot(self.target.B * D_inv, self.target.B.T)
@@ -52,5 +52,3 @@ class CMAES(GaussianNaturalGradientOptimizer):
         xp = self.target.xp
         control_factor = xp.exp((c_sigma / d_sigma) * (-1. + xp.linalg.norm(self.p_sigma) / self.ex_norm))
         return control_factor
-
-

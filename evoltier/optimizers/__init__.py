@@ -1,6 +1,3 @@
-from evoltier.optimizers import gaussian_natural_gradient
-from evoltier.optimizers import cma_es
-from evoltier.optimizers import bernoulli_natural_gradient
-GaussianNaturalGradientOptimizer = gaussian_natural_gradient.GaussianNaturalGradientOptimizer
-CMAES = cma_es.CMAES
-BernoulliNaturalGradientOptimizer = bernoulli_natural_gradient.BernoulliNaturalGradientOptimizer
+from .gaussian_natural_gradient import GaussianNaturalGradientOptimizer
+from .cma_es import CMAES
+from .bernoulli_natural_gradient import BernoulliNaturalGradientOptimizer

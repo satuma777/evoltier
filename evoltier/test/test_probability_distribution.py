@@ -15,18 +15,6 @@ class TestProbabilityDistribution(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             self.distribution.sampling()
 
-    def test_get_param(self):
-        with self.assertRaises(NotImplementedError):
-            self.distribution.get_param()
-
-    def test_set_param(self):
-        with self.assertRaises(NotImplementedError):
-            self.distribution.set_param()
-
-    def test_calculate_log_likelihood(self):
-        with self.assertRaises(NotImplementedError):
-            self.distribution.calculate_log_likelihood()
-
     def test_get_info(self):
         with self.assertRaises(NotImplementedError):
             self.distribution.get_info()
