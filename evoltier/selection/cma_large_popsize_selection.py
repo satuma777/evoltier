@@ -9,7 +9,7 @@ class CMALargePopSizeSelection(QuantileBasedSelection):
     [Shirakawa et al. 2015 (GECCO2015)]<http://shiralab.ynu.ac.jp/data/paper/gecco2015_shirakawa.pdf>
     """
 
-    def transform(self, quantiles, xp=np):
-        weight = -2. * xp.log(2. * quantiles)
-        weight[quantiles > 0.5] = 0
+    def transform(self, rank_based_vals, xp=np):
+        weight = -2. * xp.log(2. * rank_based_vals)
+        weight[rank_based_vals > 0.5] = 0
         return weight

@@ -16,10 +16,10 @@ class PBILSelection(RankingBasedSelection):
         self.selection_rate = selection_rate
         self.is_use_negative = is_use_negative
 
-    def transform(self, ranking, xp=np):
-        weights = xp.zeros_like(ranking)
-        worst_rank = len(ranking)
-        idx_sorted_rank = xp.argsort(ranking)
+    def transform(self, rank_based_vals, xp=np):
+        weights = xp.zeros_like(rank_based_vals)
+        worst_rank = len(rank_based_vals)
+        idx_sorted_rank = xp.argsort(rank_based_vals)
 
         if self.is_use_negative:
             half_num_weight = floor(worst_rank * self.selection_rate / 2.)

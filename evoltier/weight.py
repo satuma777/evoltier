@@ -44,7 +44,7 @@ class QuantileBasedSelection(object):
         quantile = cum_llr / pop_size
         return quantile
 
-    def transform(self, quantiles, xp=np):
+    def transform(self, rank_based_vals, xp=np):
         raise NotImplementedError()
 
 

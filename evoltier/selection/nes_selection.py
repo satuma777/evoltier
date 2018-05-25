@@ -8,8 +8,8 @@ class NESSelection(RankingBasedSelection):
     [Wierstra et. al., 2014]<http://jmlr.org/papers/v15/wierstra14a.html>
     """
 
-    def transform(self, ranking, xp=np):
-        lam = len(ranking)
-        weight = xp.maximum(0, xp.log((lam / 2) + 1) - xp.log(ranking))
+    def transform(self, rank_based_vals, xp=np):
+        lam = len(rank_based_vals)
+        weight = xp.maximum(0, xp.log((lam / 2) + 1) - xp.log(rank_based_vals))
         weight /= weight.sum()
         return weight - 1. / lam

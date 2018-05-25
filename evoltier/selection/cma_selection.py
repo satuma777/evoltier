@@ -8,8 +8,8 @@ class CMASelection(RankingBasedSelection):
     [Hansen & Auger, 2014]<https://arxiv.org/abs/1604.00772>
     """
 
-    def transform(self, ranking, xp=np):
-        lam = len(ranking)
-        weight = xp.maximum(0, xp.log((lam + 1) / 2) - xp.log(ranking))
+    def transform(self, rank_based_vals, xp=np):
+        lam = len(rank_based_vals)
+        weight = xp.maximum(0, xp.log((lam + 1) / 2) - xp.log(rank_based_vals))
         weight /= weight.sum()
         return weight
