@@ -1,4 +1,5 @@
 # load modules
-from evoltier import model
-from evoltier import test
-from evoltier import optimizers
+from . import model
+from . import test
+from . import optimizers
+from . import selection

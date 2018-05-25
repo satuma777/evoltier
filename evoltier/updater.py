@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from six.moves import range
 import csv
 import os
@@ -15,7 +14,7 @@ class Updater(object):
         self.pop_size = pop_size
         self.threshold = threshold
         self.max_iter = max_iter
-        self.min = optimizer.w_func.min
+        self.min = optimizer.w_func.is_minimize
         self.out = out
         self.logging = logging
 
