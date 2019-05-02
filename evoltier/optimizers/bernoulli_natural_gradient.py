@@ -1,14 +1,13 @@
 from __future__ import print_function, division
 
-from evoltier.optimizer import Optimizer
-from evoltier.model.bernoulli import Bernoulli
+from optimizer import Optimizer
+from model.bernoulli import Bernoulli
 
 
 class BernoulliNaturalGradientOptimizer(Optimizer):
     def __init__(self, weight_function, lr, distribution=None, dim=None):
         if dim is None and distribution is None:
-            print('Need to set argument "dim" or "distribution"')
-            raise
+            raise RuntimeError('Need to set argument "dim" or "distribution"')
         dist = distribution if distribution is not None else Bernoulli(dim=dim)
         super(BernoulliNaturalGradientOptimizer, self).__init__(dist, weight_function, lr)
 

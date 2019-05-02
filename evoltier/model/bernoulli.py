@@ -1,6 +1,6 @@
 import numpy as np
 
-from evoltier.model import ProbabilityDistribution
+from model import ProbabilityDistribution
 
 
 class Bernoulli(ProbabilityDistribution):

@@ -2,19 +2,19 @@ from __future__ import division
 import numpy as np
 
 
-class QuantileBasedSelection(object):
+class RankingBasedSelection(object):
     def __init__(self, is_minimize=True, is_normalize=False):
         self.is_minimize = is_minimize
         self.is_normalize = is_normalize
 
     def __call__(self, evals, coefficient=None, xp=np):
-        quantiles = self.compute_quantiles(evals, coefficient=None, xp=xp)
-        weight = self.transform(quantiles, xp=xp)
+        ranking = self.compute_ranking(evals, coefficient=None, xp=xp)
+        weight = self.transform(ranking, xp=xp)
         if self.is_normalize:
             weight /= xp.linalg.norm(weight, ord=1)
         return weight
 
-    def compute_quantiles(self, evals, coefficient=None, xp=np, rank_rule='upper'):
+    def compute_ranking(self, evals, coefficient=None, xp=np, rank_rule='upper'):
         pop_size = evals.shape[0]
         if coefficient is None:
             coefficient = xp.ones(pop_size)
@@ -36,28 +36,23 @@ class QuantileBasedSelection(object):
         # cumulative counts of likelihood ratio
         count = xp.r_[False, xp.cumsum(coefficient[sorter])]
 
-        if rank_rule == 'upper':
-            cum_llr = count[dense]
-        elif rank_rule == 'lower':
-            cum_llr = count[dense - 1]
-
-        quantile = cum_llr / pop_size
-        return quantile
+        ranking = count[dense] if rank_rule == 'upper' else count[dense - 1]
+        return ranking
 
     def transform(self, rank_based_vals, xp=np):
         raise NotImplementedError()
 
 
-class RankingBasedSelection(QuantileBasedSelection):
+class QuantileBasedSelection(RankingBasedSelection):
     def __init__(self, is_minimize=True, is_normalize=False):
-        super(RankingBasedSelection, self).__init__(is_minimize, is_normalize)
+        super(QuantileBasedSelection, self).__init__(is_minimize, is_normalize)
 
     def __call__(self, evals, coefficient=None, xp=np,):
-        ranking = self.compute_ranking(evals, coefficient=coefficient, xp=xp)
-        weight = self.transform(ranking, xp=xp)
+        quntiles = self.compute_ranking(evals, coefficient=coefficient, xp=xp) / len(evals)
+        weight = self.transform(quntiles, xp=xp)
         if self.is_minimize:
             weight /= xp.linalg.norm(weight, ord=1)
         return weight
 
-    def compute_ranking(self, evals, coefficient=None, xp=np):
-        return self.compute_quantiles(evals, coefficient=coefficient, xp=xp) * len(evals)
+    def transform(self, rank_based_vals, xp=np):
+        raise NotImplementedError()

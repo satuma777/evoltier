@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 
-from evoltier.optimizers.gaussian_natural_gradient import GaussianNaturalGradientOptimizer
+from .gaussian_natural_gradient import GaussianNaturalGradientOptimizer
 
 
 class CMAES(GaussianNaturalGradientOptimizer):

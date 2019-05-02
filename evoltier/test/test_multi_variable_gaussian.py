@@ -1,8 +1,6 @@
 import unittest
-import numpy as np
-import itertools
 
-from evoltier.model import MultiVariableGaussian
+from model import MultiVariableGaussian
 
 
 class TestMultiVariableGaussian(unittest.TestCase):

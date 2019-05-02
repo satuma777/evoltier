@@ -1,7 +1,6 @@
 import numpy as np
-from six.moves import range
 
-from evoltier.model import ProbabilityDistribution
+from model import ProbabilityDistribution
 
 
 class MultiVariableGaussian(ProbabilityDistribution):

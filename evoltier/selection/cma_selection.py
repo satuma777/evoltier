@@ -2,6 +2,7 @@ import numpy as np
 
 from ..weight import RankingBasedSelection
 
+
 class CMASelection(RankingBasedSelection):
     """
     This selection scheme is Non-increasing transformation as CMA-ES weight. See also,

@@ -1,6 +1,6 @@
 import unittest
 
-from evoltier.model import ProbabilityDistribution
+from model import ProbabilityDistribution
 
 
 class TestProbabilityDistribution(unittest.TestCase):
@@ -13,7 +13,7 @@ class TestProbabilityDistribution(unittest.TestCase):
 
     def test_sampling(self):
         with self.assertRaises(NotImplementedError):
-            self.distribution.sampling()
+            self.distribution.sampling(pop_size=10)
 
     def test_get_info(self):
         with self.assertRaises(NotImplementedError):

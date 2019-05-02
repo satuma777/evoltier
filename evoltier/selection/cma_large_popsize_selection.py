@@ -2,6 +2,7 @@ import numpy as np
 
 from ..weight import QuantileBasedSelection
 
+
 class CMALargePopSizeSelection(QuantileBasedSelection):
     """
     This selection scheme is Non-increasing transformation as CMA-ES weight which is

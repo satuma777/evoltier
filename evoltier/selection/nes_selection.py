@@ -2,6 +2,7 @@ import numpy as np
 
 from ..weight import RankingBasedSelection
 
+
 class NESSelection(RankingBasedSelection):
     """
     This selection scheme is Non-increasing transformation as NES weight. See also,
